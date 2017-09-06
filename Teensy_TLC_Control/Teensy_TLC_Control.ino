@@ -1,4 +1,4 @@
-// TLC5955 Testing Program for Teensy 3.2
+// TLC5955 control program for Teensy 3.2
 // Junteng Li, jl944@cam.ac.uk
 // Updated 01/09/2017
 
