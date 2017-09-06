@@ -68,12 +68,12 @@ void setup() {
 
     // Set Function Control Data Latch values. See the TLC5955 Datasheet for the purpose of this latch.
     // The five bits are:
-    // Auto display repeat mode enable bit,
-    // Display timing reset mode enable bit,
-    // Auto data refresh mode enable bit,
-    // ES-PWM mode enable bit,
-    // LSD detection voltage selection bit.
-    tlc.setFunctionData(true, true, true, false, true);  // WORKS with fast update
+    // Auto display repeat mode enable bit, set to 1 to auto-repeat if no data for the next frame arrives
+    // Display timing reset mode enable bit, set to 1 to synchronize signal and display clock
+    // Auto data refresh mode enable bit, refer to data sheet p.36
+    // ES-PWM mode enable bit, must be set to 1 unless multiplexing mode is to be used
+    // LSD detection voltage selection bit, not currently implemented
+    tlc.setFunctionData(true, true, true, true, true);  // WORKS with fast update
     //  tlc.setFunctionData(true, false, false, true, true);   // WORKS generally
 
     // set all brightness levels to max (127)

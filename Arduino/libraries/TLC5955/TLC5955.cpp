@@ -46,7 +46,7 @@ void TLC5955::init(uint8_t gslat, uint8_t spi_mosi, uint8_t spi_clk) {
 
     // Initialize _rgbOrder[TLC_COUNT][LEDS_PER_CHIP][COLOR_CHANNEL_COUNT]
     // If not initialized, TLC5955::updateLeds() won't work properly
-    // Junteng Li, 2017
+    // Modified by Junteng Li in Sep, 2017
     setRgbPinOrder(1, 2, 0);  // B, R, G by increasing pin number in the footprint
 }
 
@@ -347,14 +347,18 @@ void TLC5955::latch() {
 void TLC5955::setBuffer(uint8_t bit) {
     bitWrite(_buffer, _bufferCount, bit);
     _bufferCount--;
-    SPI.beginTransaction(mSettings);
+
+    // Moved the SPI transactions into the if statement
+    // so that only one SPI transaction is performed
+    // Modified by Junteng Li in Sep, 2017
     if (_bufferCount == -1) {
+        SPI.beginTransaction(mSettings);
         if (SERIAL_DEBUG)
             printByte(_buffer);
 
         SPI.transfer(_buffer);
         _bufferCount = 7;
         _buffer = 0;
+        SPI.endTransaction();
     }
-    SPI.endTransaction();
 }
