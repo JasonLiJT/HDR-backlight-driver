@@ -163,7 +163,7 @@ void PWM_control(int mDelay, int led1, int led2) {
     for (int dimVal = dimMax; dimVal >= 0; dimVal -= dimDelta) {
         delay(mDelay);
         // tlc.setAllLed((uint16_t)dimVal);
-        tlc.setLed(led2, dimVal, dimVal, 0);
+        tlc.setLed(led2, 0, dimVal, dimVal);
         tlc.updateLeds();
         // Serial.println(dimVal);
     }
