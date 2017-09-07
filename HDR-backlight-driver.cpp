@@ -10,22 +10,54 @@
 using std::cerr;
 using std::endl;
 
-uint8_t PcbCoordinateConverter::to_gsIndex(uint8_t x, uint8_t y) {
-    // Look up for the index for _gsData[] in TLC5955 class
-    if (x < 0 || x > 8 || y < 0 || y > 15) {
-        cerr << "TLC5955converter::to_gsIndex(): index out of range\n";
-        exit(1);
-    }
-    return _gsIndex[x][y];
+TLCdriver::TLCdriver() {
+    // Constructor:
+    // Verify the conversion matrices
+    checksum();
 }
 
-PcbCoordinateConverter PCB_xy;
+void TLCdriver::verify_coordinate(uint8_t x, uint8_t y) {
+    if (x < 0 || x >= SCREEN_SIZE_X || y < 0 || y >= SCREEN_SIZE_Y) {
+        cerr << "TLC5955converter::to_gsIndex(): index out of range" << endl;
+        exit(1);
+    }
+}
+
+void TLCdriver::checksum() {
+    int c[LED_CHANNELS_PER_CHIP] = {0};
+    for (int i = 0; i < SCREEN_SIZE_X; i++) {
+        for (int j = 0; j < SCREEN_SIZE_Y; j++) {
+            c[_gsIndexChannel[i][j]] += _gsIndexColor[i][j] + _gsIndexChip[i][j];
+        }
+    }
+
+    // Checksum: expected LED_CHANNELS_PER_CHIP output of 18
+    for (int i = 0; i < LED_CHANNELS_PER_CHIP; i++) {
+        if (c[i] != 18) {
+            cerr << "TLCdriver::checksum(): Error:\n";
+            cerr << "\tExpected all values to be 18.\n";
+            cerr << "\tValues obtained: ";
+            for (int i = 0; i < LED_CHANNELS_PER_CHIP; i++) {
+                cerr << c[i] << ' ';
+            }
+            cerr << '\n';
+            exit(1);
+        }
+        // cerr << "Checksum OK." << endl;
+    }
+}
+
+void TLCdriver::changeBrightness(uint8_t x, uint8_t y, uint16_t bright) {
+    verify_coordinate(x, y);
+    _gsData[_gsIndexChip[x][y]][_gsIndexChannel[x][y]][_gsIndexColor[x][y]] = bright;
+}
+
+TLCdriver TLCteensy;
 
 int main() {
     int tlc = serialport_init("/dev/cu.usbmodem3118791", 9600);
-    
+
     serialport_write(tlc, "\\");
-    
     serialport_close(tlc);
     return 0;
 }
