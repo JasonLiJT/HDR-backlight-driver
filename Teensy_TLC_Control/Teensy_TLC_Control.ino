@@ -26,6 +26,8 @@ elapsedMicros timer_0;  // automatically incremented, must be global
 void serial_control();
 void PWM_control(int mDelay = 10, int led1 = 4, int led2 = 8 + LEDS_PER_CHIP);  // Default configurations for testing
 int getSerialInt();
+void testing_program();
+void receiveFrameUpdate();
 
 void setup() {
     // USB is always 12 Mbit/sec for Teensy
@@ -89,6 +91,10 @@ void setup() {
 }
 
 void loop() {
+    receiveFrameUpdate();
+}
+
+void testing_program() {
     PWM_control();
 
     // Use serial input to control the behaviour of the drivers
@@ -188,4 +194,46 @@ int getSerialInt() {
         i += Serial.read() - '0';
     }
     return i;
+}
+
+void receiveFrameUpdate() {
+    while (1) {
+        // Detect the start of update
+        int a, b;
+        while (!Serial.available())
+            ;
+        a = Serial.read();  // Read the first byte
+        while (!Serial.available())
+            ;
+        b = Serial.peek();  // Peek the second byte
+        if (a == 'G' && b == 'O') {
+            // The start of the update
+            // Pop the second byte from the stream
+            Serial.read();
+            break;
+        }
+    }
+
+    uint16_t bright;
+    int high_byte, low_byte;  // May be -1 if not available
+    for (int i = 0; i < TLC_COUNT; i++) {
+        for (int j = 0; j < LEDS_PER_CHIP; j++) {
+            for (int k = 0; k < COLOR_CHANNEL_COUNT; k++) {
+                while (!Serial.available())
+                    ;
+                high_byte = Serial.read();  // Receive the higher byte first
+                while (!Serial.available())
+                    ;
+                low_byte = Serial.read();  // Then the lower byte
+                bright = ((uint16_t)high_byte) << 8;
+                bright |= (uint16_t)(low_byte & 0x00FF);
+                tlc.setLEDpin(i, j, k, bright);
+            }
+        }
+    }
+    tlc.updateLeds();
+
+    // Feedback: done
+    Serial.write('D');
+    Serial.write('N');
 }

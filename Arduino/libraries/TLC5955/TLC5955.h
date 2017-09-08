@@ -73,6 +73,9 @@ class TLC5955 {
     void setLed(uint16_t ledNum, uint16_t rgb);
     void setLedAppend(uint16_t ledNum, uint16_t red, uint16_t green, uint16_t blue);
 
+    // Set individual LED pin
+    void setLEDpin(int8_t chip, int8_t channel, int8_t color, uint16_t bright);
+
     // Control Mode Parameters
     void setBrightnessCurrent(uint8_t global);
     void setBrightnessCurrent(uint8_t red, uint8_t green, uint8_t blue);

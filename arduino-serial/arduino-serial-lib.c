@@ -117,15 +117,26 @@ int serialport_write(int fd, const char* str)
     return 0;
 }
 
-//  Write binary data not ending with '\0'
-int serialport_writeBuffer(int fd, const uint8_t* buf, int len)
+int serialport_readByte(int fd, int timeout)
 {
-    int n = write(fd, buf, len);
-    if( n!=len ) {
-        perror("serialport_writeBuffer: couldn't write whole buffer\n\t");
-        return -1;
-    }
-    return 0;
+    char b[1];  // read expects an array, so we give it a 1-byte array
+    do { 
+        int n = read(fd, b, 1);  // read a char at a time
+        if( n==-1) return -1;    // couldn't read
+        if( n==0 ) {
+            usleep( 1 * 1000 );  // wait 1 msec try again
+            timeout--;
+            if( timeout==0 ) return -2;
+            continue;
+        }
+#ifdef SERIALPORTDEBUG  
+        printf("serialport_readByte: n=%d b='%c'\n",n,b[0]); // debug
+#endif
+        // Read success
+        break;
+
+    } while(timeout > 0);
+    return b[0];
 }
 
 //

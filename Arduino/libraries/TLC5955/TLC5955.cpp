@@ -47,7 +47,7 @@ void TLC5955::init(uint8_t gslat, uint8_t spi_mosi, uint8_t spi_clk) {
     // Initialize _rgbOrder[TLC_COUNT][LEDS_PER_CHIP][COLOR_CHANNEL_COUNT]
     // If not initialized, TLC5955::updateLeds() won't work properly
     // Modified by Junteng Li in Sep, 2017
-    setRgbPinOrder(0, 1, 2);// Default R - G - B order everywhere
+    setRgbPinOrder(0, 1, 2);  // Default R - G - B order everywhere
 }
 
 void TLC5955::setRgbPinOrder(uint8_t rPos, uint8_t grPos, uint8_t bPos) {
@@ -361,4 +361,8 @@ void TLC5955::setBuffer(uint8_t bit) {
         _buffer = 0;
         SPI.endTransaction();
     }
+}
+
+void TLC5955::setLEDpin(int8_t chip, int8_t channel, int8_t color, uint16_t bright) {
+    _gsData[chip][channel][color] = bright;
 }

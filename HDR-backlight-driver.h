@@ -14,7 +14,10 @@
 namespace hdrbacklightdriverjli {
 
 class TLCdriver {
-    uint16_t _gsData[TLC_COUNT][LED_CHANNELS_PER_CHIP][COLOR_CHANNEL_COUNT];
+
+    // The array for all grayscale pixel values
+    // Initialize all to 0
+    uint16_t _gsData[TLC_COUNT][LED_CHANNELS_PER_CHIP][COLOR_CHANNEL_COUNT] = {{{0}}};
 
     // Convert PCB LED coordinate to the indices of _gsData[]
     const uint8_t _gsIndexChip[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
@@ -55,12 +58,27 @@ class TLCdriver {
     };
 
    public:
+    // ctor: Open serial port and verify the conversion matrices with checksum()
     TLCdriver();
+    TLCdriver(const char* serialport, int baud);
+
+    // dtor: Close serial port
+    ~TLCdriver();
+
+    // Accessor methods
+    int get_fd() {
+        return serialport_fd;
+    }
+
+    // Update state variables
     void setLED(uint8_t x, uint8_t y, uint16_t bright);
     void setAllLED(uint16_t bright);
-    void sendGsData();
+
+    // Send data to Teensy
+    void updateFrame();
 
    private:
+    int serialport_fd;
     void verify_coordinate(uint8_t x, uint8_t y);
     void checksum();
 };
