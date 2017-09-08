@@ -158,10 +158,18 @@ void speedtest() {
         clock_t timer_start = clock();
         int step = 0x100;
         for (int bright = 0; bright < 0x10000; bright += step) {
-            TLCteensy.setAllLED(bright);
+            // TLCteensy.setAllLED(bright);
+            TLCteensy.setAllLED(0);
+            TLCteensy.setLED(5, 11, bright);
             TLCteensy.updateFrame();
         }
-        cerr << 1.0 * (0x10000 / step) / (1.0 * (clock() - timer_start) / CLOCKS_PER_SEC) << " frames per sec." << endl;
+        for (int bright = 0x10000; bright > 0; bright -= step) {
+            // TLCteensy.setAllLED(bright);
+            TLCteensy.setAllLED(0);
+            TLCteensy.setLED(1, 7, bright);
+            TLCteensy.updateFrame();
+        }
+        cerr << 2.0 * (0x10000 / step) / (1.0 * (clock() - timer_start) / CLOCKS_PER_SEC) << " frames per sec." << endl;
     }
 }
 
