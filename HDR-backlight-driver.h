@@ -7,10 +7,14 @@
 #define SCREEN_SIZE_X 9
 #define SCREEN_SIZE_Y 16
 
+#define TLC_COUNT 3
 #define LED_CHANNELS_PER_CHIP 16
+#define COLOR_CHANNEL_COUNT 3
+
+namespace hdrbacklightdriverjli {
 
 class TLCdriver {
-    uint16_t _gsData[3][LED_CHANNELS_PER_CHIP][3];
+    uint16_t _gsData[TLC_COUNT][LED_CHANNELS_PER_CHIP][COLOR_CHANNEL_COUNT];
 
     // Convert PCB LED coordinate to the indices of _gsData[]
     const uint8_t _gsIndexChip[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
@@ -37,6 +41,7 @@ class TLCdriver {
         {15, 15, 11, 11, 7, 7, 3, 3, 6, 6, 1, 1, 1, 0, 8, 8},
     };
 
+    // Quick check: Adjacent LEDs in the same channel must have different color
     const uint8_t _gsIndexColor[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
         {1, 0, 2, 1, 0, 2, 1, 0, 0, 1, 2, 1, 2, 1, 0, 2},
         {2, 1, 0, 2, 1, 0, 2, 2, 2, 1, 0, 0, 1, 1, 0, 2},
@@ -51,12 +56,13 @@ class TLCdriver {
 
    public:
     TLCdriver();
-    void changeBrightness(uint8_t x, uint8_t y, uint16_t bright);
+    void setLED(uint8_t x, uint8_t y, uint16_t bright);
+    void setAllLED(uint16_t bright);
     void sendGsData();
-    
-private:
+
+   private:
     void verify_coordinate(uint8_t x, uint8_t y);
     void checksum();
 };
-
+}
 #endif  // !HDR_BACKLIGHT_DRIVER_H

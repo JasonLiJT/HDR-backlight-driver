@@ -10,6 +10,8 @@
 using std::cerr;
 using std::endl;
 
+namespace hdrbacklightdriverjli {
+
 TLCdriver::TLCdriver() {
     // Constructor:
     // Verify the conversion matrices
@@ -24,6 +26,12 @@ void TLCdriver::verify_coordinate(uint8_t x, uint8_t y) {
 }
 
 void TLCdriver::checksum() {
+    // Checksum: each channel is expected to have a checksum of:
+    //   TLC_COUNT * COLOR_CHANNEL_COUNT * (COLOR_CHANNEL_COUNT - 1) / 2
+    //           + COLOR_CHANNEL_COUNT * TLC_COUNT * (TLC_COUNT - 1) / 2
+    // = TLC_COUNT * COLOR_CHANNEL_COUNT * (COLOR_CHANNEL_COUNT + TLC_COUNT - 2) / 2
+    int expected_sum = TLC_COUNT * COLOR_CHANNEL_COUNT * (COLOR_CHANNEL_COUNT + TLC_COUNT - 2) / 2;
+
     int c[LED_CHANNELS_PER_CHIP] = {0};
     for (int i = 0; i < SCREEN_SIZE_X; i++) {
         for (int j = 0; j < SCREEN_SIZE_Y; j++) {
@@ -31,11 +39,10 @@ void TLCdriver::checksum() {
         }
     }
 
-    // Checksum: expected LED_CHANNELS_PER_CHIP output of 18
     for (int i = 0; i < LED_CHANNELS_PER_CHIP; i++) {
-        if (c[i] != 18) {
+        if (c[i] != expected_sum) {
             cerr << "TLCdriver::checksum(): Error:\n";
-            cerr << "\tExpected all values to be 18.\n";
+            cerr << "\tExpected all checksums to be " << expected_sum << ".\n";
             cerr << "\tValues obtained: ";
             for (int i = 0; i < LED_CHANNELS_PER_CHIP; i++) {
                 cerr << c[i] << ' ';
@@ -47,11 +54,26 @@ void TLCdriver::checksum() {
     }
 }
 
-void TLCdriver::changeBrightness(uint8_t x, uint8_t y, uint16_t bright) {
+void TLCdriver::setLED(uint8_t x, uint8_t y, uint16_t bright) {
     verify_coordinate(x, y);
     _gsData[_gsIndexChip[x][y]][_gsIndexChannel[x][y]][_gsIndexColor[x][y]] = bright;
 }
 
+void TLCdriver::setAllLED(uint16_t bright) {
+    for (int i = 0; i < TLC_COUNT; i++) {
+        for (int j = 0; j < LED_CHANNELS_PER_CHIP; j++) {
+            for (int k = 0; k < COLOR_CHANNEL_COUNT; k++) {
+                _gsData[i][j][k] = bright;
+            }
+        }
+    }
+}
+}
+
+
+//-----------------------Demo Program--------------------------------
+
+using hdrbacklightdriverjli::TLCdriver;
 TLCdriver TLCteensy;
 
 int main() {
