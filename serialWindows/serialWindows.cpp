@@ -1,4 +1,4 @@
-#include "serialWindows.h"
+#include "serialWindows.hpp"
 
 SerialPortWindows::SerialPortWindows(const char *portName) {
     //We're not yet connected

@@ -5,7 +5,7 @@
 #include <string>
 #include <ctime>
 
-#include "HDR-backlight-driver.h"
+#include "HDR-backlight-driver.hpp"
 
 #ifdef USING_SERIAL_WINDOWS_LIBRARY
 // use the library for Windows

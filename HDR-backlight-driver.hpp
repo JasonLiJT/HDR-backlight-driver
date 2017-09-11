@@ -7,7 +7,7 @@
 #if defined(__MINGW32__) || defined(WIN32)
 #define USING_SERIAL_WINDOWS_LIBRARY
 // use the library for Windows
-#include "serialWindows/serialWindows.h"
+#include "serialWindows/serialWindows.hpp"
 #endif
 
 #define SCREEN_SIZE_X 9
