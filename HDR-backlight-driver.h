@@ -4,6 +4,12 @@
 #include <iostream>  // std::cerr
 #include <cstdlib>   // exit()
 
+#if defined(__MINGW32__) || defined(WIN32)
+#define USING_SERIAL_WINDOWS_LIBRARY
+// use the library for Windows
+#include "serialWindows/serialWindows.h"
+#endif
+
 #define SCREEN_SIZE_X 9
 #define SCREEN_SIZE_Y 16
 
@@ -13,8 +19,12 @@
 
 namespace hdrbacklightdriverjli {
 
-class TLCdriver {
-
+class TLCdriver
+#ifdef USING_SERIAL_WINDOWS_LIBRARY
+    // Inherite from the serialWindows library class
+    : public SerialPortWindows
+#endif
+{
     // The array for all grayscale pixel values
     // Initialize all to 0
     uint16_t _gsData[TLC_COUNT][LED_CHANNELS_PER_CHIP][COLOR_CHANNEL_COUNT] = {{{0}}};

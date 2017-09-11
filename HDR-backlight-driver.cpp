@@ -6,7 +6,13 @@
 #include <ctime>
 
 #include "HDR-backlight-driver.h"
+
+#ifdef USING_SERIAL_WINDOWS_LIBRARY
+// use the library for Windows
+#include "serialWindows/serialWindows.cpp"
+#else
 #include "arduino-serial/arduino-serial-lib.c"
+#endif
 
 using std::cerr;
 using std::endl;
@@ -130,8 +136,8 @@ void TLCdriver::updateFrame() {
 
 using hdrbacklightdriverjli::TLCdriver;
 
-void blink() {
-    TLCdriver TLCteensy("/dev/cu.usbmodem3118791", 9600);
+void blink(const char* serialport) {
+    TLCdriver TLCteensy(serialport, 9600);
     clock_t timer_start;
     while (1) {
         timer_start = clock();
@@ -152,8 +158,8 @@ void blink() {
     serialport_write(TLCteensy.get_fd(), "\\");
 }
 
-void speedtest() {
-    TLCdriver TLCteensy("/dev/cu.usbmodem3118791", 9600);
+void speedtest(const char* serialport) {
+    TLCdriver TLCteensy(serialport, 9600);
     while (1) {
         clock_t timer_start = clock();
         int step = 0x100;
@@ -174,5 +180,5 @@ void speedtest() {
 }
 
 int main() {
-    speedtest();
+    speedtest("/dev/cu.usbmodem3118791");
 }
