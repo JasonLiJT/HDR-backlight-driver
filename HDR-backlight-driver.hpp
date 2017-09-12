@@ -4,7 +4,7 @@
 #include <iostream>  // std::cerr
 #include <cstdlib>   // exit()
 
-#if defined(__MINGW32__) || defined(WIN32)
+#if defined(__MINGW32__) || defined(_WIN32)
 #define USING_SERIAL_WINDOWS_LIBRARY
 // use the library for Windows
 #include "serialWindows/serialWindows.hpp"

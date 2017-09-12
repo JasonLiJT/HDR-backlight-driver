@@ -20,7 +20,7 @@ using std::endl;
 
 namespace hdrbacklightdriverjli {
 
-TLCdriver::TLCdriver(const char* serialport, int baud) {
+TLCdriver::TLCdriver(const char *serialport, int baud) {
     // Constructor
     serialport_fd = serialport_init(serialport, baud);
     if (serialport_fd == INVALID_HANDLE_VALUE) {
@@ -143,8 +143,28 @@ void TLCdriver::updateFrame() {
 
 using hdrbacklightdriverjli::TLCdriver;
 
-void blink(const char* serialport) {
-    TLCdriver TLCteensy(serialport, 9600);
+class StopWatch {
+   public:
+    StopWatch() = default;
+    StopWatch(StopWatch &&) = default;
+    StopWatch(const StopWatch &) = default;
+    StopWatch &operator=(StopWatch &&) = default;
+    StopWatch &operator=(const StopWatch &) = default;
+    ~StopWatch() = default;
+
+   private:
+};
+
+void sleep_ms(unsigned long ms) {
+#ifdef USING_SERIAL_WINDOWS_LIBRARY
+
+#else
+
+#endif
+}
+
+void blink() {
+    TLCdriver TLCteensy;
     clock_t timer_start;
     while (1) {
         timer_start = clock();
@@ -163,8 +183,8 @@ void blink(const char* serialport) {
     }
 }
 
-void speedtest(const char* portname = "\\\\.\\COM5") {
-    TLCdriver TLCteensy(portname, 9600);
+void speedtest() {
+    TLCdriver TLCteensy;
     while (1) {
         clock_t timer_start = clock();
         int step = 0x100;
