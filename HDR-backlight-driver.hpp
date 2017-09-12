@@ -8,6 +8,9 @@
 #define USING_SERIAL_WINDOWS_LIBRARY
 // use the library for Windows
 #include "serialWindows/serialWindows.hpp"
+#define DEFAULT_SERIAL_PORT "\\\\.\\COM4"
+#else
+#define DEFAULT_SERIAL_PORT "/dev/cu.usbmodem3118791"
 #endif
 
 #define SCREEN_SIZE_X 9
@@ -22,6 +25,7 @@ namespace hdrbacklightdriverjli {
 class TLCdriver
 #ifdef USING_SERIAL_WINDOWS_LIBRARY
     // Inherite from the serialWindows library class
+    // Use the same function signatures as arduino-serial-lib
     : public SerialPortWindows
 #endif
 {
@@ -69,14 +73,13 @@ class TLCdriver
 
    public:
     // ctor: Open serial port and verify the conversion matrices with checksum()
-    TLCdriver();
-    TLCdriver(const char* serialport, int baud);
+    TLCdriver(const char* serialport = DEFAULT_SERIAL_PORT, int baud = 9600);
 
     // dtor: Close serial port
     ~TLCdriver();
 
     // Accessor methods
-    int get_fd() {
+    auto get_fd() {
         return serialport_fd;
     }
 
@@ -88,7 +91,11 @@ class TLCdriver
     void updateFrame();
 
    private:
+#ifdef USING_SERIAL_WINDOWS_LIBRARY
+    HANDLE serialport_fd;
+#else
     int serialport_fd;
+#endif
     void verify_coordinate(uint8_t x, uint8_t y);
     void checksum();
 };

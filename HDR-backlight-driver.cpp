@@ -12,6 +12,7 @@
 #include "serialWindows/serialWindows.cpp"
 #else
 #include "arduino-serial/arduino-serial-lib.c"
+#define INVALID_HANDLE_VALUE -1
 #endif
 
 using std::cerr;
@@ -19,23 +20,10 @@ using std::endl;
 
 namespace hdrbacklightdriverjli {
 
-TLCdriver::TLCdriver() {
-    // Constructor
-    serialport_fd = serialport_init("/dev/cu.usbmodem3118791", 9600);
-    if (serialport_fd == -1) {
-        // Error occurred
-        // Error handled in serialport_init()
-        exit(1);
-    }
-
-    // Verify the conversion matrices
-    checksum();
-}
-
 TLCdriver::TLCdriver(const char* serialport, int baud) {
     // Constructor
     serialport_fd = serialport_init(serialport, baud);
-    if (serialport_fd == -1) {
+    if (serialport_fd == INVALID_HANDLE_VALUE) {
         // Error occurred
         // Error handled in serialport_init()
         exit(1);
@@ -154,12 +142,10 @@ void blink(const char* serialport) {
         TLCteensy.updateFrame();
         cerr << "Update 65535" << endl;
     }
-
-    serialport_write(TLCteensy.get_fd(), "\\");
 }
 
-void speedtest(const char* serialport) {
-    TLCdriver TLCteensy(serialport, 9600);
+void speedtest() {
+    TLCdriver TLCteensy;
     while (1) {
         clock_t timer_start = clock();
         int step = 0x100;
@@ -180,5 +166,5 @@ void speedtest(const char* serialport) {
 }
 
 int main() {
-    speedtest("/dev/cu.usbmodem3118791");
+    speedtest();
 }

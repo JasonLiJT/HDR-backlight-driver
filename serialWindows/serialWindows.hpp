@@ -20,20 +20,22 @@ class SerialPortWindows {
 
    public:
     //Initialize Serial communication with the given COM port
-    SerialPortWindows(const char *portName);
-    //Close the connection
-    ~SerialPortWindows();
+    auto serialport_init(const char *serialport = "\\\\.\\COM4", int baud = 9600);
 
-    auto serialport_init(const char* serialport, int baud);
-    
+    //Close the connection
+    void serialport_close(HANDLE placeholder);
+
     //Read data in a buffer, if nbChar is greater than the
     //maximum number of bytes available, it will return only the
     //bytes available. The function return -1 when nothing could
     //be read, the number of bytes actually read.
     int ReadData(char *buffer, unsigned int nbChar);
+    int serialport_readByte(auto placeholder, auto timeout);
     //Writes data from a buffer through the Serial connection
     //return true on success.
     bool WriteData(const char *buffer, unsigned int nbChar);
+    bool serialport_write(auto placeholder, const char *buffer);
+    bool serialport_writebyte(auto placeholder, uint8_t byte_to_send);        
     //Check if we are actually connected
     bool IsConnected();
 };
