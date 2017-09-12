@@ -144,8 +144,8 @@ void blink(const char* serialport) {
     }
 }
 
-void speedtest() {
-    TLCdriver TLCteensy;
+void speedtest(const char* portname = "\\\\.\\COM5") {
+    TLCdriver TLCteensy(portname, 9600);
     while (1) {
         clock_t timer_start = clock();
         int step = 0x100;
