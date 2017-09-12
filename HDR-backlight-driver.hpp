@@ -33,6 +33,13 @@ class TLCdriver
     // Initialize all to 0
     uint16_t _gsData[TLC_COUNT][LED_CHANNELS_PER_CHIP][COLOR_CHANNEL_COUNT] = {{{0}}};
 
+    uint8_t* write_buffer;
+    int write_buffer_size;
+
+    // Used to allocate memory for *write_buffer
+    // Allocate 144*2 more for safety
+    const int MAX_write_buffer_size = 2 * TLC_COUNT * LED_CHANNELS_PER_CHIP * COLOR_CHANNEL_COUNT + 144 * 2;
+
     // Convert PCB LED coordinate to the indices of _gsData[]
     const uint8_t _gsIndexChip[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
@@ -79,7 +86,7 @@ class TLCdriver
     ~TLCdriver();
 
     // Accessor methods
-    auto get_fd() {
+    auto get_fd() const {
         return serialport_fd;
     }
 
@@ -91,6 +98,7 @@ class TLCdriver
     void updateFrame();
 
    private:
+    bool add_to_buffer(uint8_t byte);
 #ifdef USING_SERIAL_WINDOWS_LIBRARY
     HANDLE serialport_fd;
 #else

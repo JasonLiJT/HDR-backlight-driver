@@ -31,10 +31,15 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
 
     // Verify the conversion matrices
     checksum();
+
+    // Allocate memory for *write_buffer
+    write_buffer = new uint8_t[MAX_write_buffer_size];
+    write_buffer_size = 0;
 }
 
 TLCdriver::~TLCdriver() {
     // Destructor
+    delete[] write_buffer;
 
     serialport_close(serialport_fd);
 }
@@ -90,20 +95,34 @@ void TLCdriver::setAllLED(uint16_t bright) {
     }
 }
 
-void TLCdriver::updateFrame() {
-    // 0xFF, 0x00 mark the start
-    serialport_writebyte(serialport_fd, 'G');
-    serialport_writebyte(serialport_fd, 'O');
+bool TLCdriver::add_to_buffer(uint8_t byte) {
+    if (write_buffer_size >= MAX_write_buffer_size) {
+        return false;
+    }
+    write_buffer[write_buffer_size++] = byte;
+    return true;
+}
 
+void TLCdriver::updateFrame() {
+    ////////////////////////////////////////////////////
+    //Write and send data
+
+    // 0xFF, 0x00 mark the start
+    add_to_buffer('G');
+    add_to_buffer('O');
     for (int i = 0; i < TLC_COUNT; i++) {
         for (int j = 0; j < LED_CHANNELS_PER_CHIP; j++) {
             for (int k = 0; k < COLOR_CHANNEL_COUNT; k++) {
-                serialport_writebyte(serialport_fd, (uint8_t)(_gsData[i][j][k] >> 8));  // Send the higher byte first
-                serialport_writebyte(serialport_fd, (uint8_t)(_gsData[i][j][k]));       // Then the lower byte
+                add_to_buffer((uint8_t)(_gsData[i][j][k] >> 8));  // Send the higher byte first
+                add_to_buffer((uint8_t)(_gsData[i][j][k]));       // Then the lower byte
             }
         }
     }
+    serialport_writeBuffer(serialport_fd, write_buffer, write_buffer_size);
+    write_buffer_size = 0;
 
+    ///////////////////////////////////////////////////
+    // Read feedback
     int feedback_byte_0, feedback_byte_1;
     feedback_byte_0 = serialport_readByte(serialport_fd, 90);  // 90 ms timeout
     feedback_byte_1 = serialport_readByte(serialport_fd, 10);  // 10 ms timeout

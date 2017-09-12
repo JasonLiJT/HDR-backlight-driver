@@ -35,7 +35,8 @@ class SerialPortWindows {
     //return true on success.
     bool WriteData(const char *buffer, unsigned int nbChar);
     bool serialport_write(auto placeholder, const char *buffer);
-    bool serialport_writebyte(auto placeholder, uint8_t byte_to_send);        
+    bool serialport_writeBuffer(auto placeholder, const uint8_t *buffer, int len);
+    bool serialport_writebyte(auto placeholder, uint8_t byte_to_send);
     //Check if we are actually connected
     bool IsConnected();
 };

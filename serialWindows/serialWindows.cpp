@@ -1,5 +1,7 @@
 #include "serialWindows.hpp"
 
+#include <ctime>  // For sleep()
+
 auto SerialPortWindows::serialport_init(const char *serialport, int baud) {
     //We're not yet connected
     this->connected = false;
@@ -102,16 +104,23 @@ int SerialPortWindows::serialport_readByte(auto placeholder, auto timeout) {
 
     uint8_t byte_to_read[1];
 
-    //Use the ClearCommError function to get status info on the Serial port
-    ClearCommError(this->hSerial, &this->errors, &this->status);
+    do {
+        //Use the ClearCommError function to get status info on the Serial port
+        ClearCommError(this->hSerial, &this->errors, &this->status);
 
-    //Check if there is something to read
-    if (this->status.cbInQue > 0) {
-        //Try to read the require number of chars, and return the number of read bytes on success
-        if (ReadFile(this->hSerial, byte_to_read, 1, &bytesRead, NULL)) {
-            return byte_to_read[0];
+        //Check if there is something to read
+        if (this->status.cbInQue > 0) {
+            //Try to read the require number of chars, and return the number of read bytes on success
+            if (ReadFile(this->hSerial, byte_to_read, 1, &bytesRead, NULL)) {
+                return byte_to_read[0];
+            }
         }
-    }
+        clock_t timer_start = clock();
+        while (clock() - timer_start < CLOCKS_PER_SEC / 1000)
+            // Sleep for 1 ms
+            ;
+        if (timeout <= 0) return -2;
+    } while (timeout > 0);
 
     //If nothing has been read, or that an error was detected return -1
     return -1;
@@ -135,6 +144,19 @@ bool SerialPortWindows::serialport_writebyte(auto placeholder, uint8_t byte_to_s
 
     //Try to write the buffer on the Serial port
     if (!WriteFile(this->hSerial, &byte_to_send, 1, &bytesSend, 0)) {
+        //In case it don't work get comm error and return false
+        ClearCommError(this->hSerial, &this->errors, &this->status);
+
+        return false;
+    } else
+        return true;
+}
+
+bool SerialPortWindows::serialport_writeBuffer(auto placeholder, const uint8_t *buffer, int len) {
+    DWORD bytesSend;
+
+    //Try to write the buffer on the Serial port
+    if (!WriteFile(this->hSerial, (void *)buffer, len, &bytesSend, 0)) {
         //In case it don't work get comm error and return false
         ClearCommError(this->hSerial, &this->errors, &this->status);
 

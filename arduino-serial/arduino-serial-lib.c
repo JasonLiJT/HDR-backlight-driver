@@ -106,6 +106,17 @@ int serialport_writebyte( int fd, uint8_t b)
 }
 
 //
+int serialport_writeBuffer(int fd, const uint8_t* buffer, int len)
+{
+    int n = write(fd, buffer, len);
+    if( n!=len ) {
+        perror("serialport_writeBuffer: couldn't write whole buffer\n\t");
+        return -1;
+    }
+    return 0;
+}
+
+//
 int serialport_write(int fd, const char* str)
 {
     int len = strlen(str); // Requires '\0' ended c string
