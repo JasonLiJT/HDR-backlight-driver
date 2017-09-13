@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <ctime>
+#include <chrono>  // For wall clock, since c++11
 
 #include "HDR-backlight-driver.hpp"
 
@@ -143,26 +144,6 @@ void TLCdriver::updateFrame() {
 
 using hdrbacklightdriverjli::TLCdriver;
 
-class StopWatch {
-   public:
-    StopWatch() = default;
-    StopWatch(StopWatch &&) = default;
-    StopWatch(const StopWatch &) = default;
-    StopWatch &operator=(StopWatch &&) = default;
-    StopWatch &operator=(const StopWatch &) = default;
-    ~StopWatch() = default;
-
-   private:
-};
-
-void sleep_ms(unsigned long ms) {
-#ifdef USING_SERIAL_WINDOWS_LIBRARY
-
-#else
-
-#endif
-}
-
 void blink() {
     TLCdriver TLCteensy;
     clock_t timer_start;
@@ -186,7 +167,10 @@ void blink() {
 void speedtest() {
     TLCdriver TLCteensy;
     while (1) {
-        clock_t timer_start = clock();
+        // DO NOT use clock() from <ctime>
+        // because the thread (CPU time) sleeps during communication for synchronization
+        // Use wall time instead
+        auto timer_start = std::chrono::system_clock::now();
         int step = 0x100;
         for (int bright = 0; bright < 0x10000; bright += step) {
             // TLCteensy.setAllLED(bright);
@@ -200,7 +184,9 @@ void speedtest() {
             TLCteensy.setLED(1, 7, bright);
             TLCteensy.updateFrame();
         }
-        cerr << 2.0 * (0x10000 / step) / (1.0 * (clock() - timer_start) / CLOCKS_PER_SEC) << " frames per sec." << endl;
+        auto timer_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> wall_time_elapsed = timer_end - timer_start;  // In seconds
+        cerr << 2.0 * (0x10000 / step) / wall_time_elapsed.count() << " frames per sec." << endl;
     }
 }
 
