@@ -231,6 +231,13 @@ void receiveFrameUpdate() {
             }
         }
     }
+
+    // Optional, for driver chips' testing.
+    // Because the drivers are not well connected at startup, i.e. void setup(),
+    // Teensy needs to make sure the control bits are configured after connection
+    // It will lower the frame rate from 160 FPS to 110 FPS
+    tlc.updateControl();
+
     tlc.updateLeds();
 
     // Feedback: done

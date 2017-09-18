@@ -190,6 +190,35 @@ void speedtest() {
     }
 }
 
+void testLEDs() {
+    TLCdriver TLCteensy;
+    while (1) {
+        // DO NOT use clock() from <ctime>
+        // because the thread (CPU time) sleeps during communication for synchronization
+        // Use wall time instead
+        auto timer_start = std::chrono::system_clock::now();
+        auto time_step = std::chrono::milliseconds(0);
+        TLCteensy.setAllLED(0);
+        TLCteensy.updateFrame();
+        for (int x = 0; x < SCREEN_SIZE_X; x++) {
+            for (int y = 0; y < SCREEN_SIZE_Y; y++) {
+                // Delay time_step milliseconds
+                auto temp_start = std::chrono::system_clock::now();
+                while (std::chrono::system_clock::now() - temp_start < time_step)
+                    ;
+
+                TLCteensy.setAllLED(0);
+                TLCteensy.setLED(x, y, 0xFFFF);
+                TLCteensy.updateFrame();
+            }
+        }
+        auto timer_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> wall_time_elapsed = timer_end - timer_start;  // In seconds
+        cerr << (1 + SCREEN_SIZE_X * SCREEN_SIZE_Y) / wall_time_elapsed.count() << " frames per sec." << endl;
+    }
+}
+
 int main() {
-    speedtest();
+    // speedtest();
+    testLEDs();
 }
