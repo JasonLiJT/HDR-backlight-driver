@@ -1,6 +1,6 @@
 #include "serialWindows.hpp"
 
-#include <ctime>  // For sleep()
+#include <ctime>  // For clock()
 
 auto SerialPortWindows::serialport_init(const char *serialport, int baud) {
     //We're not yet connected
