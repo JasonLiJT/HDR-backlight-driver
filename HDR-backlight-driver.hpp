@@ -8,9 +8,19 @@
 #define USING_SERIAL_WINDOWS_LIBRARY
 // use the library for Windows
 #include "serialWindows/serialWindows.hpp"
+
+//*****************************************************
+// Change the default serial port name here (for Windows)
 #define DEFAULT_SERIAL_PORT "\\\\.\\COM4"
+//*****************************************************
+
 #else
+
+//*****************************************************
+// Change the default serial port name here (for Mac OS X / Linux)
 #define DEFAULT_SERIAL_PORT "/dev/cu.usbmodem3118791"
+//*****************************************************
+
 #endif
 
 #define SCREEN_SIZE_X 9
@@ -41,7 +51,7 @@ class TLCdriver
     const int MAX_write_buffer_size = 2 * TLC_COUNT * LED_CHANNELS_PER_CHIP * COLOR_CHANNEL_COUNT + 144 * 2;
 
     // Convert PCB LED coordinate to the indices of _gsData[]
-    const uint8_t _gsIndexChip[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
+    const size_t _gsIndexChip[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
@@ -53,7 +63,7 @@ class TLCdriver
         {2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0, 0, 0, 0, 0, 0},
     };
 
-    const uint8_t _gsIndexChannel[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
+    const size_t _gsIndexChannel[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
         {9, 9, 9, 12, 12, 12, 8, 8, 4, 4, 0, 2, 6, 11, 11, 11},
         {10, 14, 14, 14, 13, 13, 13, 8, 4, 0, 0, 6, 6, 15, 15, 15},
         {10, 10, 15, 15, 15, 11, 11, 11, 7, 5, 5, 3, 3, 10, 10, 10},
@@ -66,7 +76,7 @@ class TLCdriver
     };
 
     // Quick check: Adjacent LEDs in the same channel must have different color
-    const uint8_t _gsIndexColor[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
+    const size_t _gsIndexColor[SCREEN_SIZE_X][SCREEN_SIZE_Y] = {
         {1, 0, 2, 1, 0, 2, 1, 0, 0, 1, 2, 1, 2, 1, 0, 2},
         {2, 1, 0, 2, 1, 0, 2, 2, 2, 1, 0, 0, 1, 1, 0, 2},
         {0, 1, 2, 0, 1, 2, 0, 1, 1, 1, 2, 0, 2, 1, 0, 2},
@@ -79,10 +89,10 @@ class TLCdriver
     };
 
    public:
-    // ctor: Open serial port and verify the conversion matrices with checksum()
+    // ctor: Open serial port, allocate memory and verify the conversion matrices with checksum()
     TLCdriver(const char* serialport = DEFAULT_SERIAL_PORT, int baud = 9600);
 
-    // dtor: Close serial port
+    // dtor: Free memory space and close serial port
     ~TLCdriver();
 
     // Accessor methods
@@ -91,7 +101,7 @@ class TLCdriver
     }
 
     // Update state variables
-    void setLED(uint8_t x, uint8_t y, uint16_t bright);
+    void setLED(size_t x, size_t y, uint16_t bright);
     void setAllLED(uint16_t bright);
 
     // Send data to Teensy
@@ -104,7 +114,7 @@ class TLCdriver
 #else
     int serialport_fd;
 #endif
-    void verify_coordinate(uint8_t x, uint8_t y);
+    void verify_coordinate(size_t x, size_t y);
     void checksum();
 };
 }

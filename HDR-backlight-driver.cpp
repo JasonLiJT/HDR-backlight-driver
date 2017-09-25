@@ -40,13 +40,15 @@ TLCdriver::TLCdriver(const char *serialport, int baud) {
 
 TLCdriver::~TLCdriver() {
     // Destructor
+    // Free memory space
     delete[] write_buffer;
 
+    // Close the serial port
     serialport_close(serialport_fd);
 }
 
-void TLCdriver::verify_coordinate(uint8_t x, uint8_t y) {
-    if (x < 0 || x >= SCREEN_SIZE_X || y < 0 || y >= SCREEN_SIZE_Y) {
+void TLCdriver::verify_coordinate(size_t x, size_t y) {
+    if (x >= SCREEN_SIZE_X || y >= SCREEN_SIZE_Y) {  // size_t is always unsigned: no need to check sign
         cerr << "TLC5955converter::to_gsIndex(): index out of range" << endl;
         exit(1);
     }
@@ -81,7 +83,7 @@ void TLCdriver::checksum() {
     }
 }
 
-void TLCdriver::setLED(uint8_t x, uint8_t y, uint16_t bright) {
+void TLCdriver::setLED(size_t x, size_t y, uint16_t bright) {
     verify_coordinate(x, y);
     _gsData[_gsIndexChip[x][y]][_gsIndexChannel[x][y]][_gsIndexColor[x][y]] = bright;
 }
