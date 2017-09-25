@@ -5,7 +5,7 @@
 #ifndef HDR_BACKLIGHT_DRIVER_H
 #define HDR_BACKLIGHT_DRIVER_H
 
-#include <iostream>  // std::cerr, std::endl
+#include <iostream>  // std::cerr, std::clog, std::endl
 #include <cstdlib>   // exit()
 #include <ctime>     // clock()
 #include <chrono>    // For wall clock, since c++11
@@ -133,6 +133,7 @@ class TLCdriver
 namespace hdrbacklightdriverjli {
 
 using std::cerr;
+using std::clog;
 using std::endl;
 
 TLCdriver::TLCdriver(const char* serialport, int baud) {
@@ -143,6 +144,8 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
         // Error handled in serialport_init()
         exit(1);
     }
+
+    clog << "Port \"" << serialport << "\" successfully opened :)" << endl;
 
     // Verify the conversion matrices
     checksum();
@@ -193,8 +196,8 @@ void TLCdriver::checksum() {
             cerr << '\n';
             exit(1);
         }
-        // cerr << "Checksum OK." << endl;
     }
+    clog << "Conversion matrices checksum OK." << endl;
 }
 
 void TLCdriver::setLED(size_t x, size_t y, uint16_t bright) {
