@@ -17,6 +17,9 @@
 
 //*****************************************************
 // Change the default serial port name here (for Windows)
+// Note that if the port number is larger than 9, e.g. COM10,
+// "\\\\.\\COM10" has to be used.
+// "COM10" won't work. (Well, it's Windows)
 #define DEFAULT_SERIAL_PORT "\\\\.\\COM4"
 //*****************************************************
 
@@ -106,7 +109,8 @@ class TLCdriver
     ~TLCdriver();
 
     // Accessor methods
-    auto get_fd() const {
+    auto get_fd() const {  // deduced return types are a C++14 extension
+        // The return types are different on Windows and POSIX systems
         return serialport_fd;
     }
 
