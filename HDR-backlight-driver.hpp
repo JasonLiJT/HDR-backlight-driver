@@ -7,8 +7,6 @@
 
 #include <iostream>  // std::cerr, std::clog, std::endl
 #include <cstdlib>   // exit()
-#include <ctime>     // clock()
-#include <chrono>    // For wall clock, since c++11
 
 #if defined(__MINGW32__) || defined(_WIN32)
 #define USING_SERIAL_WINDOWS_LIBRARY
@@ -117,6 +115,8 @@ class TLCdriver
     // Update state variables
     void setLED(size_t x, size_t y, uint16_t bright);  // Set the brightness of the LED at (x, y) to bright
     void setAllLED(uint16_t bright);
+    // Debug: set the brightness of the LEDs of a specific chip
+    void setLEDChip(size_t chip_index, uint16_t bright);
 
     // Send data to Teensy
     void updateFrame();
@@ -216,6 +216,19 @@ void TLCdriver::setAllLED(uint16_t bright) {
             for (int k = 0; k < COLOR_CHANNEL_COUNT; k++) {
                 _gsData[i][j][k] = bright;
             }
+        }
+    }
+}
+
+void TLCdriver::setLEDChip(size_t chip_index, uint16_t bright) {
+    // DEBUG Chip problems
+    // Set the brightness of the LEDs of a specific chip
+    if (chip_index >= TLC_COUNT) {
+        cerr << "TLCdriver::setLEDChip(): chip_index out of range!" << endl;
+    }
+    for (int j = 0; j < LED_CHANNELS_PER_CHIP; j++) {
+        for (int k = 0; k < COLOR_CHANNEL_COUNT; k++) {
+            _gsData[chip_index][j][k] = bright;
         }
     }
 }
