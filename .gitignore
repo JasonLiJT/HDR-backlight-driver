@@ -3,6 +3,8 @@
 *
 # Unignore all with extensions
 !*.*
+# Unignore LICENSE
+!LICENSE
 # Unignore all dirs
 !*/
 !/**/

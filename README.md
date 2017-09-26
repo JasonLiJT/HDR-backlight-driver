@@ -1,6 +1,6 @@
 # HDR backlight driver
 
-This driver library is designed to control TLC5955 LED drivers via Teensy 3.2 with serial communication protocol.
+This C++ library is designed to control TLC5955 LED drivers via Teensy 3.2 with serial communication protocol.
 
 The *Teensy_TLC_Control* sketch is the Teensy 3.2 client, and the *HDR-backlight-driver.hpp* is the driver library for your C++ program to run on your computer.
 
