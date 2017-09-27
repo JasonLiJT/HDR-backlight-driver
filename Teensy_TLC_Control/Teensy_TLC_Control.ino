@@ -215,14 +215,10 @@ void receiveFrameUpdate() {
             Serial.read();
             break;
         }
-        if (a == 'C' && b == 'N') {
+        if (a == 'R' && b == 'T') {
             // Just connected
-            // Pop the second byte from the stream
-            Serial.read();
-
-            // Sleep for 0.5s, somehow required to raise fps
-            delay(500);
-            break;
+            // Need to reboot to boost serial speed for some reason
+            _reboot_Teensyduino_();
         }
     }
 

@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <iostream>  // std::cerr, std::clog, std::endl
 #include <cstdlib>   // exit()
+#include <ctime>     // clock()
 
 #if defined(__MINGW32__) || defined(_WIN32)
 #define USING_SERIAL_WINDOWS_LIBRARY
@@ -174,16 +175,35 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
 
     clog << "Port \"" << serialport << "\" successfully opened :)" << endl;
 
+    // Tell teensy to reset
+    serialport_writebyte(serialport_fd, 'R');
+    serialport_writebyte(serialport_fd, 'T');
+
+    clog << "Resetting Teensy..." << endl;
+
+    serialport_close(serialport_fd);
+
+    while (1) {
+        clock_t timer_start = clock();
+        while (clock() - timer_start < 3 * CLOCKS_PER_SEC)
+            ;
+
+        serialport_fd = serialport_init(serialport, baud);
+        if (serialport_fd != INVALID_HANDLE_VALUE) {
+            break;
+        } else {
+            clog << "\n\nTeensy still rebooting..." << endl;
+        }
+    }
+
+    clog << "Reboot complete!" << endl;
+
     // Verify the conversion matrices
     checksum();
 
     // Allocate memory for *write_buffer
     write_buffer = new uint8_t[MAX_write_buffer_size];
     write_buffer_size = 0;
-
-    // Tell teensy the connection starts
-    serialport_writebyte(serialport_fd, 'C');
-    serialport_writebyte(serialport_fd, 'N');
 }
 
 TLCdriver::~TLCdriver() {
