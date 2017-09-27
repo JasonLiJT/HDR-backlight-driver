@@ -271,12 +271,8 @@ void TLC5955::setAllDcData(uint8_t dcvalue) {
     }
 }
 
-void TLC5955::setLedDc(uint16_t ledNum, uint8_t dcR, uint8_t dcG, uint8_t dcB) {
-    uint8_t chip = (uint16_t)floor(ledNum / 16);
-    uint8_t channel = (uint8_t)(ledNum - 16 * chip);  //Turn that LED on
-    _dcData[chip][channel][2] = dcB;
-    _dcData[chip][channel][1] = dcG;
-    _dcData[chip][channel][0] = dcR;
+void TLC5955::setLedDc(size_t chip, size_t channel, size_t color, uint8_t dcvalue) {
+    _dcData[chip][channel][color] = dcvalue;
 }
 
 // Update the Control Register (changes settings)

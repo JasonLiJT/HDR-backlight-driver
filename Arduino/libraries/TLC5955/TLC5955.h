@@ -80,7 +80,7 @@ class TLC5955 {
     void setBrightnessCurrent(uint8_t global);
     void setBrightnessCurrent(uint8_t red, uint8_t green, uint8_t blue);
     void setAllDcData(uint8_t dcvalue);
-    void setLedDc(uint16_t ledNum, uint8_t dcR, uint8_t dcG, uint8_t dcB);
+    void setLedDc(size_t chip, size_t channel, size_t color, uint8_t dcvalue);
     void setMaxCurrent(uint8_t MCR, uint8_t MCG, uint8_t MCB);
     void setMaxCurrent(uint8_t MCRGB);
     void setFunctionData(bool DSPRPT, bool TMGRST, bool RFRESH, bool ESPWM, bool LSDVLT);

@@ -65,6 +65,9 @@ void setup() {
     // We must set dot correction values, so set them all to the brightest adjustment
     tlc.setAllDcData(127);
 
+    // Test Dot Correction
+    tlc.setLedDc(1, 13, 2, 0);
+
     // Set Max Current Values (see TLC5955 datasheet)
     tlc.setMaxCurrent(4, 4, 4);
 
@@ -75,7 +78,7 @@ void setup() {
     // Auto data refresh mode enable bit, refer to data sheet p.36
     // ES-PWM mode enable bit, must be set to 1 unless multiplexing mode is to be used
     // LSD detection voltage selection bit, not currently implemented
-    tlc.setFunctionData(true, true, true, true, true);  // WORKS with fast update
+    tlc.setFunctionData(false, true, true, true, true);  // WORKS with fast update
     //  tlc.setFunctionData(true, false, false, true, true);   // WORKS generally
 
     // set all brightness levels to max (127)
@@ -236,7 +239,7 @@ void receiveFrameUpdate() {
     // Because the drivers are not well connected at startup, i.e. void setup(),
     // Teensy needs to make sure the control bits are configured after connection
     // It will lower the frame rate from 160 FPS to 110 FPS
-    tlc.updateControl();
+    // tlc.updateControl();
 
     tlc.updateLeds();
 
