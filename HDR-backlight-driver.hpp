@@ -180,6 +180,10 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
     // Allocate memory for *write_buffer
     write_buffer = new uint8_t[MAX_write_buffer_size];
     write_buffer_size = 0;
+
+    // Tell teensy the connection starts
+    serialport_writebyte(serialport_fd, 'C');
+    serialport_writebyte(serialport_fd, 'N');
 }
 
 TLCdriver::~TLCdriver() {
