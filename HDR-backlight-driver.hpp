@@ -197,7 +197,7 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
                 // Expected at least one reconnection attempt
                 break;
             } else {
-                clog << "\n\nReboot failed. Please retry." << endl;
+                clog << "\n\nReboot failed. Please reconnect the cable and retry." << endl;
                 exit(1);
             }
         } else {
