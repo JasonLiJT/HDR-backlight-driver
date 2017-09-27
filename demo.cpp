@@ -58,12 +58,13 @@ void testLEDs(TLCdriver& TLCteensy) {
     // because the thread (CPU time) sleeps during communication for synchronization
     // Use wall time instead
     auto timer_start = std::chrono::system_clock::now();
-    auto time_step = std::chrono::milliseconds(0);
+    auto time_step = std::chrono::microseconds(0);
+    // auto time_step = std::chrono::microseconds((int)(1.0 / 60 * 1e6));
     TLCteensy.setAllLED(0);
     TLCteensy.updateFrame();
     for (int x = 0; x < SCREEN_SIZE_X; x++) {
         for (int y = 0; y < SCREEN_SIZE_Y; y++) {
-            // Delay time_step milliseconds
+            // Delay time_step microseconds
             auto temp_start = std::chrono::system_clock::now();
             while (std::chrono::system_clock::now() - temp_start < time_step)
                 ;
@@ -81,8 +82,16 @@ void testLEDs(TLCdriver& TLCteensy) {
 int main() {
     TLCdriver TLCteensy(DEFAULT_SERIAL_PORT, 9600);
 
+    // For debugging: get the internal array indices of an LED
+    TLCteensy.print_index(1, 0);
+
     while (1) {
         testBrightness(TLCteensy);
         testLEDs(TLCteensy);
+        // TODO: Investigate the speed drop from 400 FPS to 150 FPS
+
+        // TODO: separate the latch() from updateLEDs(): write updateLEDsWithoutLatch()
+        // TODO: control latch at each frame update
+        // TODO: think of a way to synchronize the backlight with the LCD screen
     }
 }

@@ -131,6 +131,9 @@ class TLCdriver
         // The return types are different on Windows and POSIX systems
         return serialport_fd;
     }
+    void print_index(size_t x, size_t y) {
+        std::clog << "Internal data indices of (" << x << ", " << y << "):\n\t" << _gsIndexChip[x][y] << " " << _gsIndexChannel[x][y] << " " << _gsIndexColor[x][y] << std::endl;
+    }
 
     // Update state variables
     void setLED(size_t x, size_t y, uint16_t bright);  // Set the brightness of the LED at (x, y) to bright
