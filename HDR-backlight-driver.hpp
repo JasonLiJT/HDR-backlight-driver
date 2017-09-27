@@ -183,19 +183,29 @@ TLCdriver::TLCdriver(const char* serialport, int baud) {
 
     serialport_close(serialport_fd);
 
+    int connect_count = 0;
     while (1) {
         clock_t timer_start = clock();
-        while (clock() - timer_start < 3 * CLOCKS_PER_SEC)
+        while (clock() - timer_start < 0.1 * CLOCKS_PER_SEC)
+            // Wait 0.1s before reconnecting
             ;
 
         serialport_fd = serialport_init(serialport, baud);
+        connect_count++;
         if (serialport_fd != INVALID_HANDLE_VALUE) {
-            break;
+            if (connect_count > 1) {
+                // Expected at least one reconnection attempt
+                break;
+            } else {
+                clog << "\n\nReboot failed. Please retry." << endl;
+                exit(1);
+            }
         } else {
             clog << "\n\nTeensy still rebooting..." << endl;
         }
     }
 
+    clog << "\n\nThe error messages above are expected.\n";
     clog << "Reboot complete!" << endl;
 
     // Verify the conversion matrices

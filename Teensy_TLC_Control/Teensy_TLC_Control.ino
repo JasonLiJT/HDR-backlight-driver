@@ -218,7 +218,10 @@ void receiveFrameUpdate() {
         if (a == 'R' && b == 'T') {
             // Just connected
             // Need to reboot to boost serial speed for some reason
-            _reboot_Teensyduino_();
+
+            // Write the value for restart to the Application Interrupt and Reset Control location
+            (*(volatile uint32_t *)0xE000ED0C) = 0x05FA0004;
+            // _reboot_Teensyduino_();  // Much slower
         }
     }
 
