@@ -58,7 +58,7 @@ void testLEDs(TLCdriver& TLCteensy) {
     // because the thread (CPU time) sleeps during communication for synchronization
     // Use wall time instead
     auto timer_start = std::chrono::system_clock::now();
-    auto time_step = std::chrono::microseconds(0);
+    // auto time_step = std::chrono::microseconds(0);
     // auto time_step = std::chrono::microseconds((int)(1.0 / 60 * 1e6));
     TLCteensy.setAllLED(0);
     TLCteensy.updateFrame();
@@ -66,12 +66,19 @@ void testLEDs(TLCdriver& TLCteensy) {
         for (int y = 0; y < SCREEN_SIZE_Y; y++) {
             // Delay time_step microseconds
             auto temp_start = std::chrono::system_clock::now();
-            while (std::chrono::system_clock::now() - temp_start < time_step)
-                ;
+            // while (std::chrono::system_clock::now() - temp_start < time_step)
+            //     ;
 
             TLCteensy.setAllLED(0);
             TLCteensy.setLED(x, y, 0xFFFF);
             TLCteensy.updateFrame();
+            auto temp_end = std::chrono::system_clock::now();
+            std::chrono::duration<double> temp_elapsed = temp_end - temp_start;  // In seconds
+            if (temp_elapsed > std::chrono::microseconds((int)1e6/120)) {
+                // The framerate drops below 120 fps
+                // It may cause flickering
+                clog << "The framerate drops to: " << 1 / temp_elapsed.count() << " FPS" << endl;
+            }
         }
     }
     auto timer_end = std::chrono::system_clock::now();
