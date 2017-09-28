@@ -65,8 +65,11 @@ void setup() {
     // We must set dot correction values, so set them all to the brightest adjustment
     tlc.setAllDcData(127);
 
-    // Test Dot Correction
-    tlc.setLedDc(1, 13, 2, 0);
+    // Perform Dot Correction (DC) here
+    // Dot Correction controls the maximum current of each OUT pin
+    // to compensate the difference between individual LEDs
+    // Please consult the data sheet
+    // tlc.setLedDc(1, 13, 2, 0);
 
     // Set Max Current Values (see TLC5955 datasheet)
     tlc.setMaxCurrent(4, 4, 4);
@@ -246,10 +249,19 @@ void receiveFrameUpdate() {
     // Optional, for driver chips' testing.
     // Because the drivers are not well connected at startup, i.e. void setup(),
     // Teensy needs to make sure the control bits are configured after connection
-    // It will lower the frame rate from 160 FPS to 110 FPS
+    // It will lower the frame rate significantly
     // tlc.updateControl();
 
-    tlc.updateLeds();
+    // tlc.updateLeds();
+    // This will upload the data and immediately update LEDs
+    // The latency is not guaranteed
+
+    // For synchronization with LCD screen, use the no_latch version
+    // The data is uploaded, but the LEDs won't be updated until latch() is called
+    tlc.updateLeds_no_latch();
+    // Wait for synchronization signal from LCD screen (currently not implemented)
+    tlc.latch();
+    // Refer to the data sheet for timing diagrams
 
     // Feedback: done
     Serial.write('D');

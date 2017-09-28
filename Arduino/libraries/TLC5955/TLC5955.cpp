@@ -171,6 +171,37 @@ void TLC5955::updateLeds() {
     latch();
 }
 
+void TLC5955::updateLeds_no_latch() {
+    if (SERIAL_DEBUG) {
+        Serial.println(F("Begin LED Update String (All Chips)..."));
+        Serial.println(' ');
+    }
+
+    for (int8_t chip = TLC_COUNT - 1; chip >= 0; chip--) {
+        setControlModeBit(CONTROL_MODE_OFF);
+        SPI.beginTransaction(mSettings);
+        uint8_t cChan;
+        for (int8_t a = LEDS_PER_CHIP - 1; a >= 0; a--) {            // We have 16 LED's. Start at the last since thats how we clock data out
+            for (int8_t b = COLOR_CHANNEL_COUNT - 1; b >= 0; b--) {  // Each with 3 colors
+                cChan = _rgbOrder[chip][a][b];
+                SPI.transfer((char)(_gsData[chip][a][cChan] >> 8));    // Output the MSB first
+                SPI.transfer((char)(_gsData[chip][a][cChan] & 0xFF));  // Followed by the LSB
+
+                if (SERIAL_DEBUG) {
+                    printByte((char)(_gsData[chip][a][cChan] >> 8));
+                    printByte((char)(_gsData[chip][a][cChan] & 0xFF));
+                }
+            }
+        }
+        SPI.endTransaction();
+    }
+    if (SERIAL_DEBUG) {
+        Serial.println(' ');
+        Serial.println(F("End LED Update String (All Chips)"));
+    }
+    // latch();
+}
+
 void TLC5955::setLed(uint16_t ledNum, uint16_t red, uint16_t green, uint16_t blue) {
     uint8_t chip = (uint16_t)floor(ledNum / 16);
     uint8_t channel = (uint8_t)(ledNum - 16 * chip);  //Turn that LED on

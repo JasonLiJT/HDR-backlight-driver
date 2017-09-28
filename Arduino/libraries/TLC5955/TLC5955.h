@@ -92,6 +92,7 @@ class TLC5955 {
     void setControlModeBit(bool isControlMode);
     void flushBuffer();
     void updateLeds();
+    void updateLeds_no_latch();
     void latch();
     void updateControl();
 
