@@ -1,6 +1,6 @@
 /*
------------------------Demo Program--------------------------------
-A demo driver program to run on your computer.
+-----------------------Benchmark Program--------------------------------
+Benchmark the frame rates of the backlight.
 It uses serial communication to control the Teensy 3.2,
 which controls the TLC5955 LED drivers.
 
@@ -36,21 +36,36 @@ using std::clog;
 using std::endl;
 
 void testBrightness(TLCdriver& TLCteensy) {
-    int step = 0x100 / 4;  // 256 / 4, controls the period of the following loops
+    int step = 0x100;
     for (int bright = 0; bright <= 0xFFFF; bright += step) {
-        // The range of brightness is [0, 65535]
+        auto temp_start = std::chrono::system_clock::now();
         TLCteensy.setAllLED(bright);
         TLCteensy.updateFrame();
+        auto temp_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> temp_elapsed = temp_end - temp_start;  // In seconds
+        if (temp_elapsed > std::chrono::microseconds((int)1e6 / 120)) {
+            // The framerate drops below 120 fps
+            // It may cause flickering
+            clog << "The framerate drops to: " << 1 / temp_elapsed.count() << " FPS" << endl;
+        }
     }
     for (int bright = 0xFFFF; bright >= 0; bright -= step) {
         // The following two for loops are equivalent to:
         // TLCteensy.setAllLED(bright);
+        auto temp_start = std::chrono::system_clock::now();
         for (int x = 0; x < SCREEN_SIZE_X; x++) {
             for (int y = 0; y < SCREEN_SIZE_Y; y++) {
                 TLCteensy.setLED(x, y, bright);
             }
         }
         TLCteensy.updateFrame();
+        auto temp_end = std::chrono::system_clock::now();
+        std::chrono::duration<double> temp_elapsed = temp_end - temp_start;  // In seconds
+        if (temp_elapsed > std::chrono::microseconds((int)1e6 / 120)) {
+            // The framerate drops below 120 fps
+            // It may cause flickering
+            clog << "The framerate drops to: " << 1 / temp_elapsed.count() << " FPS" << endl;
+        }
     }
 }
 
@@ -58,13 +73,10 @@ void testLEDs(TLCdriver& TLCteensy) {
     // DO NOT use clock() from <ctime>
     // because the thread (CPU time) sleeps during communication for synchronization
     // Use wall time instead
-
-    // Timers
     auto timer_start = std::chrono::system_clock::now();
-
-    // auto time_step = std::chrono::microseconds(0);  // No limit on frame rate
-    auto time_step = std::chrono::microseconds((int)(1.0 / 60 * 1e6));  // Limit the frame rate to 60 FPS
-
+    auto time_step = std::chrono::microseconds(0);  // No delay, update as fast as possible
+    TLCteensy.setAllLED(0);
+    TLCteensy.updateFrame();
     for (int x = 0; x < SCREEN_SIZE_X; x++) {
         for (int y = 0; y < SCREEN_SIZE_Y; y++) {
             // Delay time_step microseconds
@@ -75,6 +87,13 @@ void testLEDs(TLCdriver& TLCteensy) {
             TLCteensy.setAllLED(0);
             TLCteensy.setLED(x, y, 0xFFFF);
             TLCteensy.updateFrame();
+            auto temp_end = std::chrono::system_clock::now();
+            std::chrono::duration<double> temp_elapsed = temp_end - temp_start;  // In seconds
+            if (temp_elapsed > std::chrono::microseconds((int)1e6 / 120)) {
+                // The framerate drops below 120 fps
+                // It may cause flickering
+                clog << "The framerate drops to: " << 1 / temp_elapsed.count() << " FPS" << endl;
+            }
         }
     }
     auto timer_end = std::chrono::system_clock::now();
@@ -84,6 +103,9 @@ void testLEDs(TLCdriver& TLCteensy) {
 
 int main() {
     TLCdriver TLCteensy(DEFAULT_SERIAL_PORT, 9600);
+
+    // For debugging: get the internal array indices of an LED
+    TLCteensy.print_index(1, 0);
 
     while (1) {
         testBrightness(TLCteensy);
