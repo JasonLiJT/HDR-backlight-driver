@@ -72,7 +72,8 @@ void setup() {
     // tlc.setLedDc(1, 13, 2, 0);
 
     // Set Max Current Values (see TLC5955 datasheet)
-    tlc.setMaxCurrent(4, 4, 4);
+    tlc.setMaxCurrent(4, 4, 4);  // Maximum 2.75A
+    // Change to (5, 5, 5) for a maximum current of 3.44A
 
     // Set Function Control Data Latch values. See the TLC5955 Datasheet for the purpose of this latch.
     // The five bits are:
