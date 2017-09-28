@@ -26,10 +26,14 @@ using hdrbacklightdriverjli::TLCdriver;
 
 The `TLCdriver` class is in namespace `hdrbacklightdriverjli`.
 
-Have a look at *demo.cpp* for examples. The demo program can be compiled as a single C++ file:
+Have a look at *demo.cpp* for examples. The demo program and the benchmark can be compiled as single C++ files:
 
 ```
 g++ -Wall -std=c++14 HDR-backlight-driver.cpp -o HDR-backlight-driver
+```
+
+```
+g++ -Wall -std=c++14 benchmark.cpp -o benchmark
 ```
 
 ## Teensy Board Setup (only needs to be done once)

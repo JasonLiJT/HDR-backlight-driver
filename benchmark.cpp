@@ -36,6 +36,7 @@ using std::clog;
 using std::endl;
 
 void testBrightness(TLCdriver& TLCteensy) {
+    auto timer_start = std::chrono::system_clock::now();
     int step = 0x100;
     for (int bright = 0; bright <= 0xFFFF; bright += step) {
         auto temp_start = std::chrono::system_clock::now();
@@ -67,6 +68,9 @@ void testBrightness(TLCdriver& TLCteensy) {
             clog << "The framerate drops to: " << 1 / temp_elapsed.count() << " FPS" << endl;
         }
     }
+    auto timer_end = std::chrono::system_clock::now();
+    std::chrono::duration<double> wall_time_elapsed = timer_end - timer_start;  // In seconds
+    clog << (2 * 0xFFFF / step) / wall_time_elapsed.count() << " frames per sec." << endl;
 }
 
 void testLEDs(TLCdriver& TLCteensy) {
