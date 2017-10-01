@@ -50,6 +50,13 @@ void testBrightness(TLCdriver& TLCteensy) {
                 TLCteensy.setLED(x, y, bright);
             }
         }
+
+        // For debugging, TLCdriver.setLEDChip(chip_index, brightness) can set the brightness
+        // of all the LEDs controlled by a specific TLC5955 driver IC.
+        // For example, you can identify a burnt driver without having to look at the circuits.
+        // TLCteensy.setLEDChip(0, 0);
+        // TLCteensy.setLEDChip(2, 0);
+
         TLCteensy.updateFrame();
     }
 }

@@ -49,7 +49,7 @@ SOFTWARE.
 
 //*****************************************************
 // Change the default serial port name here (for Mac OS X / Linux)
-#define DEFAULT_SERIAL_PORT "/dev/cu.usbmodem3118791"
+#define DEFAULT_SERIAL_PORT "/dev/cu.usbmodem3355431"
 //*****************************************************
 
 #endif
